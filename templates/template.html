@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<head>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        .container {
+            max-width: 50em;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .window {
+            background-color: black;
+            color: white;
+            overflow: scroll;
+            padding: 1em;
+            border-radius: 0.3em;
+            min-height: 20em
+        }
+        pre {
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{header}}</h1>
+        <div class="window">
+            {% for line in result %}
+                {{line|safe}}
+            {% endfor %}
+        </div>
+    </div>
+</body>
