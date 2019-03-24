@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <style>
+        pre {
+            overflow: visible;
+            color: #f8f9fa;
+        }
+        .card {
+            overflow: scroll;
+            min-height: 20em;
+            max-height: 40em;
+            height: 30em;
+        }
+    </style>
+    <title>{{header}}</title>
+    
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script defer src="https://use.fontawesome.com/releases/v5.8.1/js/all.js" integrity="sha384-g5uSoOSBd7KkhAMlnQILrecXvzst9TdC09/VM+pjDTCM+1il8RHz5fKANTFFb+gQ" crossorigin="anonymous"></script>
+    <script>
+        var source = new EventSource("/commands/stream");
+        source.addEventListener("exit", function(event){
+            
+            $("#progress-bar").removeClass("progress-bar-striped progress-bar-animated");
+            $("#progress-bar").attr('aria-valuenow', "100").css('width', "100%");
+            
+            if (event.data == "0") {
+                $("#progress-bar").addClass("bg-success");
+            } else {
+                $("#progress-bar").addClass("bg-danger");
+                $("#window").collapse("show");
+                $("#output").scrollTop($("#output")[0].scrollHeight);
+            }
+        });
+        source.addEventListener("progress", function(event){    
+            $("#progress-bar").attr('aria-valuenow', event.data).css('width', event.data+"%");
+        });
+        source.onmessage = function(event){
+            $("#output").append(event.data);
+            $("#output").scrollTop($("#output")[0].scrollHeight);
+            console.log(event);
+        }
+        source.onerror = function(event){
+            if (event.eventPhase == EventSource.CLOSED) {
+                source.close();
+                console.log("Event Source Closed");
+            } 
+        }
+    </script>
+  </head>
+  <body>
+        <div class="container">
+            <h1 class="display-4 my-5">{{header}}</h1>
+            <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" id="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+            </div>
+            <p class="mt-5">
+                <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#window" aria-expanded="false" aria-controls="window">
+                    <i class="fas fa-angle-down mr-2"></i>
+                    Show output
+                </button>
+            </p>
+            <div class="collapse" id="window">
+                <div class="card p2 card-body bg-dark" id="output"></div>
+            </div>
+        </div>
+  </body>
+</html>
